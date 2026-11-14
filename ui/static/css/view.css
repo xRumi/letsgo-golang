@@ -1,0 +1,43 @@
+.snippet {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.25rem;
+    border: 1px solid #e2e5e9;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #24292f;
+}
+
+.metadata {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.metadata strong {
+    color: #24292f;
+    font-weight: 600;
+}
+
+.snippet pre {
+    margin: 0;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid #eaecef;
+    border-radius: 6px;
+    background: #f6f8fa;
+    color: #24292f;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.metadata time {
+    font-size: 0.8rem;
+}

@@ -21,9 +21,9 @@ $ go build -o ./build/ ./cmd/web/       # building
 $ ./build/web                           # run
 $ go run ./cmd/web/                     # build & run
 ```
-### Options
-**Environment variables from .env are only used for running with docker**
-|Option|Description|Default|
+### Flags
+**Environment variables from .env are only used when running with docker compose.**
+|Flag  |Description|Default|
 |------|-----------|-------|
 |-dsn  |MySQL data source name|*root:very-hard-password@/mydb?parseTime=true*|
 |-addr |HTTP network address to bind|:4000|

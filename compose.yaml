@@ -1,6 +1,9 @@
 services:
   web:
     build: .
+    environment:
+      - WEB_ADDR=${WEB_ADDR}
+      - WEB_DSN=${WEB_DSN}
     ports:
       - 4000:4000
     depends_on:
@@ -18,7 +21,9 @@ services:
       - my-mysql-volume:/var/lib/mysql
     healthcheck:
       test: mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}
-      interval: 5s
+      start_interval: 1s
+      start_period: 10s
+      interval: 1m
       timeout: 3s
       retries: 5
 

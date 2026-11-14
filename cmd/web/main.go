@@ -19,9 +19,10 @@ type application struct {
 }
 
 func main() {
-	// The value of flag will be stored in the addr variable at runtime
-	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "root:very-hard-password@/mydb?parseTime=true", "MySQL data source name")
+	// Make environment variables default if available, else fallback values
+	// Can override values using flags
+	addr := flag.String("addr", getEnv("WEB_ADDR", ":4000"), "HTTP network address")
+	dsn := flag.String("dsn", getEnv("WEB_DSN", "root:very-hard-password@/mydb?parseTime=true"), "MySQL data source name")
 	flag.Parse()
 
 	logger := slog.New(tint.NewTextHandler(os.Stdout, nil))
@@ -57,4 +58,11 @@ func openDB(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }

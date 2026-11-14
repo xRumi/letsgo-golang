@@ -1,0 +1,26 @@
+services:
+  web:
+    build: .
+    ports:
+      - 4000:4000
+    depends_on:
+      mysql:
+        condition: service_healthy
+  
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    ports:
+      - 3306:3306
+    volumes:
+      - my-mysql-volume:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  my-mysql-volume:

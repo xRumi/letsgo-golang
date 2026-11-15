@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 )
@@ -29,12 +30,18 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 		return
 	}
 
-	// Write provided HTTP status code
-	w.WriteHeader(status)
+	// Initialize a new buffer
+	buf := new(bytes.Buffer)
 
-	err := ts.ExecuteTemplate(w, "base", data)
+	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
+
+	// Write HTTP status code
+	w.WriteHeader(status)
+
+	// Write contents of buffer
+	buf.WriteTo(w)
 }

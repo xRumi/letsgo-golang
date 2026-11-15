@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // Logs the error in the server console and sends Internal Server Error response to the client
@@ -44,4 +45,11 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 
 	// Write contents of buffer
 	buf.WriteTo(w)
+}
+
+// Default templateData structure
+func (app *application) newTemplateData(r *http.Request) templateData {
+	return templateData{
+		TimeNow: time.Now(),
+	}
 }

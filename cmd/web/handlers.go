@@ -32,7 +32,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, r, http.StatusOK, "view.tmpl", templateData{
+	app.render(w, r, http.StatusOK, "snippetView.tmpl", templateData{
 		Snippet: snippet,
 	})
 }
@@ -62,7 +62,7 @@ func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, r, http.StatusOK, "latest.tmpl", templateData{
+	app.render(w, r, http.StatusOK, "snippetLatest.tmpl", templateData{
 		Snippets: snippets,
 	})
 }

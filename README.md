@@ -6,7 +6,7 @@ Learning Go Backend development from the Book **Let's Go by Alex Edwards** and D
 2. Docker (docker, docker-buildx, docker-compose)
 
 # Building & Running
-## Using docker
+## With docker
 ```
 $ cp example.env .env      # config
 $ docker compose up        # start

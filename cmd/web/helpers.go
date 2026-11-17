@@ -33,7 +33,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 
 	// If Dev mode is active, do not cache
 	if app.devMode {
-		newTs, err := buildTemplate(page)
+		newTs, err := buildTemplate("./ui/html/pages/" + page)
 		if err != nil {
 			app.serverError(w, r, err)
 		}

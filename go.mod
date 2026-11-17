@@ -4,6 +4,7 @@ go 1.27.3
 
 require (
 	github.com/go-sql-driver/mysql v1.10.1
+	github.com/justinas/alice v1.2.0
 	github.com/lmittmann/tint v1.2.1
 )
 

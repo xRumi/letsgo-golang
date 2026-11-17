@@ -36,20 +36,8 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		// Extract filename
 		name := filepath.Base(page)
 
-		// Parse base template
-		ts, err := template.New(name).Funcs(templateFunctions).ParseFiles("./ui/html/base.tmpl")
-		if err != nil {
-			return nil, err
-		}
-
-		// Parse allt the partial templates
-		ts, err = ts.ParseGlob("./ui/html/base.tmpl")
-		if err != nil {
-			return nil, err
-		}
-
-		// Parse page template
-		ts, err = ts.ParseFiles(page)
+		// Build template
+		ts, err := buildTemplate(page)
 		if err != nil {
 			return nil, err
 		}
@@ -58,4 +46,26 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		cache[name] = ts
 	}
 	return cache, nil
+}
+
+func buildTemplate(page string) (*template.Template, error) {
+	// Parse base template
+	ts, err := template.New(page).Funcs(templateFunctions).ParseFiles("./ui/html/base.tmpl")
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse allt the partial templates
+	ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse page template
+	ts, err = ts.ParseFiles(page)
+	if err != nil {
+		return nil, err
+	}
+
+	return ts, err
 }

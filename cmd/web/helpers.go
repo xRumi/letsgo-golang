@@ -31,6 +31,15 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 		return
 	}
 
+	// If Dev mode is active, do not cache
+	if app.devMode {
+		newTs, err := buildTemplate(page)
+		if err != nil {
+			app.serverError(w, r, err)
+		}
+		ts = newTs
+	}
+
 	// Initialize a new buffer
 	buf := new(bytes.Buffer)
 

@@ -18,6 +18,7 @@ type application struct {
 	logger        *slog.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	devMode       bool
 }
 
 func main() {
@@ -25,9 +26,16 @@ func main() {
 	// Can override values using flags
 	addr := flag.String("addr", getEnv("WEB_ADDR", ":4000"), "HTTP network address")
 	dsn := flag.String("dsn", getEnv("WEB_DSN", "root:very-hard-password@/mydb?parseTime=true"), "MySQL data source name")
+	devMode := flag.Bool("devMode", false, "Developer mode")
 	flag.Parse()
 
 	logger := slog.New(tint.NewTextHandler(os.Stdout, nil))
+
+	if *devMode {
+		logger.Info("dev mode is active")
+	}
+
+	// Connect to database
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())
@@ -36,6 +44,7 @@ func main() {
 	defer db.Close()
 	logger.Info("database connected")
 
+	// Template caching
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		logger.Error(err.Error())
@@ -48,6 +57,7 @@ func main() {
 		logger:        logger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		devMode:       *devMode,
 	}
 
 	logger.Info("starting server", "port", *addr)

@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
-// Logs the error in the server console and sends Internal Server Error response to the client
+// serverError() logs the error and sends Internal Server Error to the client.
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
 	var (
 		method = r.Method
@@ -17,12 +18,12 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
-// Sends error code response to the client
+// clientError() sends stats error code response to the client.
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
-// Renders a cached template
+// render() renders a page template.
 func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
 	ts, ok := app.templateCache[page]
 	if !ok {
@@ -31,7 +32,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 		return
 	}
 
-	// If Dev mode is active, do not cache
+	// If Dev mode is active, do not cache.
 	if app.devMode {
 		newTs, err := buildTemplate("./ui/html/pages/" + page)
 		if err != nil {
@@ -40,7 +41,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 		ts = newTs
 	}
 
-	// Initialize a new buffer
+	// Initialize a new buffer.
 	buf := new(bytes.Buffer)
 
 	err := ts.ExecuteTemplate(buf, "base", data)
@@ -49,16 +50,24 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 		return
 	}
 
-	// Write HTTP status code
+	// Write HTTP status code.
 	w.WriteHeader(status)
 
-	// Write contents of buffer
+	// Write contents of buffer.
 	buf.WriteTo(w)
 }
 
-// Default templateData structure
+// newTemplateData() returns default templateData structure.
 func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
 		TimeNow: time.Now(),
 	}
+}
+
+// getEnv() returns environment variable if exist otherwise fallback string.
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }

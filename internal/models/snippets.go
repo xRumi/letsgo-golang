@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Snippet type to hold data for individual snippet
+// Snippet type to hold data for individual snippet.
 type Snippet struct {
 	ID      int
 	Title   string
@@ -15,33 +15,33 @@ type Snippet struct {
 	Expires time.Time
 }
 
-// SnippetModel type which wraps a sql.DB connection pool
+// SnippetModel type which wraps a sql.DB connection pool.
 type SnippetModel struct {
 	DB *sql.DB
 }
 
-// This will insert a new snippet into the database
+// Insert() inserts a new snippet into the database.
 func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
 	stmt := `INSERT INTO snippets (title, content, created, expires)
 	VALUES(?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY));`
 
-	// Execute the sql statement
+	// Execute the sql statement.
 	result, err := m.DB.Exec(stmt, title, content, expires)
 	if err != nil {
 		return 0, err
 	}
 
-	// Get the ID of newly inserted record
+	// Get the ID of newly inserted record.
 	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
 
-	// Return the ID of newly inserted record
+	// Return the ID of newly inserted record.
 	return int(id), nil
 }
 
-// This will return a specific snippet based on its id
+// Get() returns a specific snippet based on its id.
 func (m *SnippetModel) Get(id int) (Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
 	WHERE expires > UTC_TIMESTAMP() AND id = ?;`
@@ -58,11 +58,11 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 		}
 	}
 
-	// Return the filled Snippet struct
+	// Return the filled Snippet struct.
 	return s, nil
 }
 
-// This will return the 10 most recently created snippets
+// Latest() returns the 10 most recently created snippets.
 func (m *SnippetModel) Latest() ([]Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
 	WHERE expires > UTC_TIMESTAMP()
@@ -74,7 +74,7 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
 	}
 	defer rows.Close()
 
-	// Initialize an empty slice to hold the Snippet structs
+	// Initialize an empty slice to hold the Snippet structs.
 	var snippets []Snippet
 
 	for rows.Next() {

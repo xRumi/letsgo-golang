@@ -22,20 +22,21 @@ type application struct {
 }
 
 func main() {
-	// Make environment variables default if available, else fallback values
-	// Can override values using flags
+	// Flags, make environment variables default if available.
 	addr := flag.String("addr", getEnv("WEB_ADDR", ":4000"), "HTTP network address")
 	dsn := flag.String("dsn", getEnv("WEB_DSN", "root:very-hard-password@/mydb?parseTime=true"), "MySQL data source name")
 	devMode := flag.Bool("devMode", false, "Developer mode")
 	flag.Parse()
 
+	// Our logger.
 	logger := slog.New(tint.NewTextHandler(os.Stdout, nil))
 
+	// Log if dev mode is active.
 	if *devMode {
 		logger.Info("dev mode is active")
 	}
 
-	// Connect to database
+	// Connect to database.
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())
@@ -44,15 +45,15 @@ func main() {
 	defer db.Close()
 	logger.Info("database connected")
 
-	// Template caching
+	// Cache templates.
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
 
-	// Initialize a new instance of application struct, containing
-	// the dependencies
+	// Initialize a new instance of application struct, containing all the
+	// dependencies.
 	app := &application{
 		logger:        logger,
 		snippets:      &models.SnippetModel{DB: db},
@@ -66,6 +67,7 @@ func main() {
 	os.Exit(1)
 }
 
+// openDB() opens MySQL database connection.
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -77,11 +79,4 @@ func openDB(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
-}
-
-func getEnv(key, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
 }

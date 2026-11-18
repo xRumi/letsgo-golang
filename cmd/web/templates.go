@@ -15,14 +15,18 @@ type templateData struct {
 	Form     SnippetCreateForm
 }
 
+// humanDate() returns formated time.Time string.
 func humanDate(t time.Time) string {
 	return t.Format("02 Jan 2006 at 15:04")
 }
 
+// Template functions.
 var templateFunctions = template.FuncMap{
 	"humanDate": humanDate,
 }
 
+// newTemplateCache() returns a map containing parsed templates for all the
+// template pages.
 func newTemplateCache() (map[string]*template.Template, error) {
 	// Initializd a new map to act as the cache.
 	cache := map[string]*template.Template{}
@@ -49,20 +53,21 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	return cache, nil
 }
 
+// buildTemplate() returns a parsed template for a template page.
 func buildTemplate(page string) (*template.Template, error) {
-	// Parse base template
+	// Parse base template.
 	ts, err := template.New(page).Funcs(templateFunctions).ParseFiles("./ui/html/base.tmpl")
 	if err != nil {
 		return nil, err
 	}
 
-	// Parse allt the partial templates
+	// Parse all the partial templates.
 	ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
 	if err != nil {
 		return nil, err
 	}
 
-	// Parse page template
+	// Parse page template.
 	ts, err = ts.ParseFiles(page)
 	if err != nil {
 		return nil, err

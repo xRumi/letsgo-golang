@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Sets default headers to all the responses
+// commonHeaders() sets default headers to all the responses.
 func commonHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' fonts.googleapis.com; font-src fonts.gstatic.com")
@@ -19,11 +19,11 @@ func commonHeaders(next http.Handler) http.Handler {
 	})
 }
 
-// Handles panic
+// recoverPanic() handles panic
 func (app *application) recoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			// Check if there has been a panic or not
+			// Check if there has been a panic or not.
 			if err := recover(); err != nil {
 				w.Header().Set("Connection", "close")
 				app.serverError(w, r, fmt.Errorf("%s", err))
@@ -33,7 +33,7 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
-// Logs all the requests
+// logRequest() logs all the requests.
 func (app *application) logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var (

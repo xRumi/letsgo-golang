@@ -11,12 +11,13 @@ import (
 	"letsgo.rumi/internal/validator"
 )
 
-// Serves the homepage
+// home() route handler for the homepage.
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	app.render(w, r, http.StatusOK, "home.tmpl", data)
 }
 
+// snippetView() route handler for viewing snippet.
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
@@ -40,6 +41,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "snippetView.tmpl", data)
 }
 
+// snippetCreate() route handler.
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form.Expires = 365
@@ -53,6 +55,7 @@ type SnippetCreateForm struct {
 	validator.Validator
 }
 
+// snippetCreatePost() route handler.
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -60,6 +63,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Try to convert string to integer.
 	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -72,7 +76,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		Expires: expires,
 	}
 
-	// Validate user inputs
+	// Validate user inputs.
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
 	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
@@ -92,9 +96,11 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Redirect if snippet insert was successful.
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
 
+// snippetLatest() route handler for showing latest snippets.
 func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
 	if err != nil {

@@ -12,6 +12,7 @@ type templateData struct {
 	TimeNow  time.Time
 	Snippet  models.Snippet
 	Snippets []models.Snippet
+	Form     SnippetCreateForm
 }
 
 func humanDate(t time.Time) string {

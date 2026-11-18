@@ -1,0 +1,50 @@
+form {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e2e5e9;
+    border-radius: 8px;
+}
+
+form > div { margin-bottom: 1rem; }
+
+form label {
+    font-weight: 500;
+}
+
+form input[type="text"],
+form textarea {
+    width: 100%;
+    padding: .7rem;
+    box-sizing: border-box;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font: inherit;
+}
+
+form textarea {
+    min-height: 200px;
+    resize: vertical;
+}
+
+form input[type="radio"] { accent-color: #0969da; }
+
+form .error {
+    color: #cf222e;
+    font-size: .85rem;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+
+form input[type="submit"] {
+    padding: .7rem 1.2rem;
+    border: 0;
+    border-radius: 6px;
+    background: #0969da;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+form input[type="submit"]:hover { background: #0757b5; }

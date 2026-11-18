@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"letsgo.rumi/internal/models"
+	"letsgo.rumi/internal/validator"
 )
 
 // Serves the homepage
@@ -47,10 +47,10 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 type SnippetCreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
+	Title   string
+	Content string
+	Expires int
+	validator.Validator
 }
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -67,31 +67,19 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	}
 
 	form := SnippetCreateForm{
-		Title:       strings.TrimSpace(r.PostForm.Get("title")),
-		Content:     strings.TrimSpace(r.PostForm.Get("content")),
-		Expires:     expires,
-		FieldErrors: map[string]string{},
+		Title:   strings.TrimSpace(r.PostForm.Get("title")),
+		Content: strings.TrimSpace(r.PostForm.Get("content")),
+		Expires: expires,
 	}
 
-	// Initialize a map to hold any validation errors for the form fields
+	// Validate user inputs
+	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
+	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Content, 40000), "content", "This field cannot be more than 40000 characters long")
+	form.CheckField(validator.PermittedValue(form.Expires, 365, 7, 1), "expires", "This field must be equal to 1, 7 or 365")
 
-	if form.Title == "" {
-		form.FieldErrors["title"] = "This field cannot be blank"
-	} else if utf8.RuneCountInString(form.Title) > 100 {
-		form.FieldErrors["title"] = "This field cannot be more than 100 characters long"
-	}
-
-	if form.Content == "" {
-		form.FieldErrors["content"] = "This field cannot be blank"
-	} else if utf8.RuneCountInString(form.Content) > 40000 {
-		form.FieldErrors["content"] = "This field cannot be more than 40000 characters long"
-	}
-
-	if form.Expires != 1 && form.Expires != 7 && form.Expires != 365 {
-		form.FieldErrors["expires"] = "This field must be equal to 1, 7, or 365"
-	}
-
-	if len(form.FieldErrors) > 0 {
+	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, r, http.StatusOK, "snippetCreate.tmpl", data)

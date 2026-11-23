@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"letsgo.rumi/internal/models"
 	"letsgo.rumi/internal/validator"
@@ -49,31 +48,19 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 type SnippetCreateForm struct {
-	Title   string
-	Content string
-	Expires int
+	Title   string `form:"title"`
+	Content string `form:"content"`
+	Expires int    `form:"expires"`
 	validator.Validator
 }
 
 // snippetCreatePost() route handler.
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	var form SnippetCreateForm
+	err := app.decodePostForm(r, form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
-	}
-
-	// Try to convert string to integer.
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	form := SnippetCreateForm{
-		Title:   strings.TrimSpace(r.PostForm.Get("title")),
-		Content: strings.TrimSpace(r.PostForm.Get("content")),
-		Expires: expires,
 	}
 
 	// Validate user inputs.

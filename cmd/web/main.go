@@ -10,6 +10,7 @@ import (
 
 	"letsgo.rumi/internal/models"
 
+	"github.com/go-playground/form"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/lmittmann/tint"
 )
@@ -18,6 +19,7 @@ type application struct {
 	logger        *slog.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 	devMode       bool
 }
 
@@ -52,12 +54,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	// Initialize a new instance of application struct, containing all the
 	// dependencies.
 	app := &application{
 		logger:        logger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 		devMode:       *devMode,
 	}
 

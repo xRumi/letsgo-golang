@@ -11,6 +11,9 @@
     <body>
         {{template "nav" .}}
         <main>
+            {{with .Flash}}
+                <div>{{.}}</div>
+            {{end}}
             {{template "main" .}}
         </main>
         <footer>Powered by <a href="https://golang.org">Go</a> in {{.TimeNow.Year}}</footer>

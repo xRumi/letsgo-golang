@@ -57,7 +57,7 @@ type SnippetCreateForm struct {
 // snippetCreatePost() route handler.
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
 	var form SnippetCreateForm
-	err := app.decodePostForm(r, form)
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -82,6 +82,9 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		app.serverError(w, r, err)
 		return
 	}
+
+	// Put flash message to the session data.
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 
 	// Redirect if snippet insert was successful.
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)

@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-playground/form"
+	"github.com/go-playground/form/v4"
 )
 
 // serverError() logs the error and sends Internal Server Error to the client.
@@ -64,6 +64,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
 		TimeNow: time.Now(),
+		Flash:   app.sessionManager.PopString(r.Context(), "flash"),
 	}
 }
 

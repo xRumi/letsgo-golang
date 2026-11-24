@@ -7,20 +7,24 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"letsgo.rumi/internal/models"
 
-	"github.com/go-playground/form"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/lmittmann/tint"
 )
 
 type application struct {
-	logger        *slog.Logger
-	snippets      *models.SnippetModel
-	templateCache map[string]*template.Template
-	formDecoder   *form.Decoder
-	devMode       bool
+	logger         *slog.Logger
+	snippets       *models.SnippetModel
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
+	devMode        bool
 }
 
 func main() {
@@ -54,16 +58,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Form decoder.
 	formDecoder := form.NewDecoder()
+
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
 
 	// Initialize a new instance of application struct, containing all the
 	// dependencies.
 	app := &application{
-		logger:        logger,
-		snippets:      &models.SnippetModel{DB: db},
-		templateCache: templateCache,
-		formDecoder:   formDecoder,
-		devMode:       *devMode,
+		logger:         logger,
+		snippets:       &models.SnippetModel{DB: db},
+		templateCache:  templateCache,
+		formDecoder:    formDecoder,
+		sessionManager: sessionManager,
+		devMode:        *devMode,
 	}
 
 	logger.Info("starting server", "port", *addr)

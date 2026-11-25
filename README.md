@@ -1,5 +1,6 @@
 # Let's Go Golang
-Learning Go Backend development from the Book **Let's Go by Alex Edwards** and Docker from the internet.
+Learning Go Backend development from the Book **Let's Go by Alex Edwards** and
+Docker from the internet.
 
 # Prerequisites
 1. Go
@@ -21,11 +22,4 @@ $ mkdir build
 $ go build -o ./build/ ./cmd/web/       # building
 $ ./build/web                           # run
 $ go run ./cmd/web/                     # build & run
-```
-### Available Flags
-|Flag       |Description|Default|
-|-----------|-----------|-------|
-|-dsn       |MySQL data source name|*root:very-hard-password@/mydb?parseTime=true*|
-|-addr      |HTTP network address to bind|:4000|
-|-devMode   |Disables template caching|false|
-|||
+``

@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -28,22 +27,22 @@ type application struct {
 }
 
 func main() {
-	// Flags, make environment variables default if available.
-	addr := flag.String("addr", getEnv("WEB_ADDR", ":4000"), "HTTP network address")
-	dsn := flag.String("dsn", getEnv("WEB_DSN", "root:very-hard-password@/mydb?parseTime=true"), "MySQL data source name")
-	devMode := flag.Bool("devMode", false, "Developer mode")
-	flag.Parse()
+	// Configs.
+	addr := getEnv("WEB_ADDR", ":4000")
+	databaseUrl := getEnv("WEB_DATABASE_URL", "root:very-hard-password@/mydb?parseTime=true")
+	devMode := getEnv("WEB_DEV_MODE", "true") == "true"
+	cookieSecure := getEnv("WEB_COOKIE_SECURE", "false") == "true"
 
 	// Our logger.
 	logger := slog.New(tint.NewTextHandler(os.Stdout, nil))
 
 	// Log if dev mode is active.
-	if *devMode {
+	if devMode {
 		logger.Info("dev mode is active")
 	}
 
 	// Connect to database.
-	db, err := openDB(*dsn)
+	db, err := openDB(databaseUrl)
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
@@ -64,6 +63,7 @@ func main() {
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
+	sessionManager.Cookie.Secure = cookieSecure
 
 	// Initialize a new instance of application struct, containing all the
 	// dependencies.
@@ -73,11 +73,18 @@ func main() {
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
-		devMode:        *devMode,
+		devMode:        devMode,
 	}
 
-	logger.Info("starting server", "port", *addr)
-	err = http.ListenAndServe(*addr, app.routes())
+	// Setup http server.
+	srv := &http.Server{
+		Addr:     addr,
+		Handler:  app.routes(),
+		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+	}
+
+	logger.Info("starting server", "addr", addr)
+	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }
